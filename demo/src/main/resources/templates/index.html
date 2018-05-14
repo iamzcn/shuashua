@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+   <head>
+   	  <meta charset="utf-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge"></meta>
+      <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"></meta>
+      <title>刷刷</title>
+      <link rel="stylesheet" href="https://cdn.bootcss.com/weui/1.1.2/style/weui.min.css"/>
+		<link rel="stylesheet" href="https://cdn.bootcss.com/jquery-weui/1.2.0/css/jquery-weui.min.css"/>
+		
+	<style type="text/css">
+		div.hide{
+			display:none;
+		}
+	</style>
+   </head>
+<body>
+
+
+
+<div class="weui-cells weui-cells_form">
+	   <div class="weui-cell">
+        <div class="weui-cell__hd"><label for="name" class="weui-label">号源</label></div>
+        <div class="weui-cell__bd">
+          <input class="weui-input" id="sourceId" type="text" value="" readonly>
+        </div>
+      </div>
+      
+	<th:block th:each="entry : ${sourceDisplayLabelMap}">
+      <th:block th:each="p : ${entry.value}">
+      <div class="weui-cell hide" th:name="'SELECT_DIV_' + ${entry.key}" >
+        <div class="weui-cell__hd"><label for="name" class="weui-label" th:utext="${p.description}"></label></div>
+        <div class="weui-cell__bd">
+          <input class="weui-input" th:name="${p.parameter}" type="text" value="" th:attr="dt=${p.dataType}" readonly>
+        </div>
+      </div>
+      </th:block>
+    </th:block>
+      
+      
+    </div>
+
+
+<br/>
+
+
+
+<a href="javascript:;" onclick="newShuaShua()" class="weui-btn weui-btn_primary">提交去刷</a>
+<a href="/doctor?TARGET=myShuaShua" class="weui-btn weui-btn_primary">我的刷刷</a>
+<a href="/doctor?TARGET=home" class="weui-btn weui-btn_primary">新起刷刷</a>
+
+ 
+ <script src="https://cdn.bootcss.com/jquery/1.11.0/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/jquery-weui/1.2.0/js/jquery-weui.min.js"></script>
+
+<!-- 如果使用了某些拓展插件还需要额外的JS -->
+<script src="https://cdn.bootcss.com/jquery-weui/1.2.0/js/swiper.min.js"></script>
+<script src="https://cdn.bootcss.com/jquery-weui/1.2.0/js/city-picker.min.js"></script>
+
+<input type="hidden" id="avoidDoubbleSubmitFlag" name="avoidDoubbleSubmitFlag" th:value="${avoidDoubbleSubmitFlag}"/>
+
+<form id="shuaForm" method="post">
+
+</form>
+
+
+   </body>
+   
+   <script th:inline="javascript">
+   
+   var sourceItems = [[${sources}]];
+   var sourceParams = [[${sourceDisplayParamMap}]];
+   
+   $(document).ready(function(){
+	   
+	   $("#sourceId").select({
+			  title: "选择号源",
+			  items: sourceItems,
+			  onChange: function(d){
+				    $("div[name^='SELECT_DIV_']").addClass("hide");
+				  	if(d.length == 1 && d.values != ""){
+				  		$("div[name^='SELECT_DIV_" + d.values + "']").removeClass("hide");
+				  	}
+				  }
+			});
+	   
+	   $.each(sourceParams, function(k1,v1){
+		   var selectDIV = $("div[name^='SELECT_DIV_" + k1 + "']");
+		   
+		   
+		   $.each(v1, function(k2,v2){
+			   var inputsString = $("input[name='" + k2 + "'][dt='string']", selectDIV);
+			   inputsString.select({
+					  title: "",
+					  items: v2
+					});
+		   });
+		   
+		   var inputsDate = $("input[dt='date']", selectDIV);
+		   inputsDate.calendar({
+			   dateFormat: "yyyy-mm-dd",
+			   onChange: function(p,values){
+				   this.input.val(values[0]);
+			   }
+		   })
+	   });
+	   
+   });
+	</script>
+   
+   
+   <script>
+   		function newShuaShua(){
+   			
+   			
+   			var inputSourceId =  $("#sourceId");
+   			
+   			if(inputSourceId.val() == ""){
+   				$.alert("请选择 号源 ！", "提示");
+   				return;
+   			}
+   			
+   			
+   			
+   			var url = "/doctor/newshuashua";
+   			var form = $("#shuaForm");
+   			
+   			form.empty();	//delete all elements in the form before submit to avoid double elements submit to backend in the 
+   							//scenario: 1st submit -> success and return -> 2nd submit (duplicated elements sent to backend)
+   			form.attr("action", url);
+
+   			var sourceId =  $("#sourceId").attr("data-values");
+   			
+   			var selectDIV = $("div[name^='SELECT_DIV_" + sourceId + "']");
+   			var inputs = $("input", selectDIV);
+   			
+   			var validation = true;
+   			inputs.each(function(){
+   				var inputValue = $(this).val();
+   				var labelName = $(this).parent().prev().text();
+   				if(inputValue == ""){
+   					validation = false;
+   	   				$.alert("请选择 " + labelName + " !", "提示");
+   	   				return;
+   	   			}
+   			});
+   			
+   			if(!validation) return;
+   			
+   			$(this).addClass(".weui-btn_loading");
+   			
+   			var input = $("<input type='hidden'/>");
+			input.attr("name", "sourceId");
+			input.attr("value", sourceId);
+			form.append(input);
+			form.append($("#avoidDoubbleSubmitFlag").clone());
+			
+   			
+   			inputs.each(function(){
+   				
+   				var parameter = $(this).attr("name");
+   				
+   				if($(this).attr("dt") == "date"){
+   					//alert("paramter " + " = " + this.value);
+   					var value = this.value;
+   				}else{
+   					//alert("paramter " + " = " + $(this).attr("data-values"));
+   					var value = $(this).attr("data-values");
+   				}
+   				
+   				var input = $("<input type='hidden'/>");
+   				input.attr("name", "parameter");
+   				input.attr("value", parameter);
+   				form.append(input);
+   				
+   				input = $("<input type='hidden'/>");
+   				input.attr("name", "value");
+   				input.attr("value", value);
+   				form.append(input);
+   			});
+   			
+   			
+   			$("#shuaForm").submit();   			
+   			
+   			return;
+   			
+   			
+   			
+   			
+   			var spList = [];
+   			
+   			
+   			var sourceId =  $("#sourceId").attr("data-values");
+   			var selectDIV = $("div[name^='SELECT_DIV_" + sourceId + "']");
+   			var inputs = $("input", selectDIV);
+   			inputs.each(function(){
+   				var sourceParam = {};
+   				var parameter = $(this).attr("name");
+   				
+   				if($(this).attr("dt") == "date"){
+   					//alert("paramter " + " = " + this.value);
+   					var value = this.value;
+   				}else{
+   					//alert("paramter " + " = " + $(this).attr("data-values"));
+   					var value = $(this).attr("data-values");
+   				}
+   				sourceParam.parameter = parameter;
+   				sourceParam.value = value;
+   				sourceParam.description = "";
+   				sourceParam.name = "";
+   				sourceParam.display = "";
+   				sourceParam.dataType = "";
+   				
+   				spList.push(sourceParam);
+   			});
+   			
+   			$.ajax(  
+   				    {  
+   				        url:url,  
+   				        //data:JSON.stringify(spList),  
+   				        data:{},
+   				        type:"post",   
+   				     	contentType: "application/json; charset=utf-8",
+   				        success:function(data)  
+   				        {  
+   				        	$.toptip('操作成功', 'success');
+   				        },  
+   				        error: function(data, status, e) {  
+   				        	$.toptip('操作失败' + data.responseText, 'error');
+   				          }  
+   				    }); 
+   			
+   			
+   		}
+   		
+   		function cancel(){
+   			var url = "/cancelAllByUser";
+   			
+   			$.ajax(  
+   				    {  
+   				        url:url,  
+   				        data:{},  
+   				        type:"post",   
+   				        success:function(data)  
+   				        {  
+   				        	$.toptip('操作成功', 'success');
+   				        },  
+   				        error: function(data, status, e) {  
+   				        	$.toptip('操作失败' + e, 'error');
+   				          }  
+   				    }); 
+   			
+   			
+   		}
+   		
+   		function test(){
+   			alert("sourceId = " + $("#sourceId").attr("data-values"));
+   			var selectDIV = $("div[name^='SELECT_DIV_" + $("#sourceId").attr("data-values") + "']");
+   			var inputs = $("input", selectDIV);
+   			inputs.each(function(){
+   				if($(this).attr("dt") == "date"){
+   					alert("paramter " + " = " + this.value);
+   				}else{
+   					alert("paramter " + " = " + $(this).attr("data-values"));
+   				}
+   				
+   			});
+   			
+   		}
+   		
+   		
+   		$(document).ready(function(){
+   			
+   			
+   		});
+   		
+   </script>
+</html>

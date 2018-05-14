@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+   <head>
+   	  <meta charset="utf-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge"></meta>
+      <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"></meta>
+      <title>刷刷</title>
+      <link rel="stylesheet" href="/jquery-weui-build/dist/lib//weui.min.css"/>
+	  <link rel="stylesheet" href="/jquery-weui-build/dist/css/jquery-weui.min.css"/>
+	  <style type="text/css">
+	  	body, html {
+		  height: 100%;
+		  -webkit-tap-highlight-color: transparent;
+		}
+	  </style>
+   </head>
+<body>
+
+<div class="weui-tab">
+  <div class="weui-tab__bd">
+		<div id="tab1" class="weui-tab__bd-item weui-tab__bd-item--active">
+		
+			 <th:block th:each="entry : ${tasking}">
+				 <div class="weui-form-preview">
+				  <div class="weui-form-preview__hd">
+				    <label class="weui-form-preview__label">状态</label>
+				    <em class="weui-form-preview__value">
+						<th:block th:switch="${entry.status}">
+								<th:block th:case="0">任务已提交</th:block>
+								<th:block th:case="1">线程已生成</th:block>
+								<th:block th:case="2">在刷中</th:block>
+						</th:block>
+					</em>
+				  </div>
+				  <div class="weui-form-preview__bd">
+				  
+				    <div class="weui-form-preview__item">
+				      <label class="weui-form-preview__label">创建时间</label>
+				      <span class="weui-form-preview__value"><th:block th:utext="${#dates.format(entry.createdTime,'yyyy-MM-dd HH:mm:ss')}"></th:block></span>
+				    </div>
+				    
+				    <div class="weui-form-preview__item">
+				      <label class="weui-form-preview__label">号源</label>
+				      <span class="weui-form-preview__value"><th:block th:utext="${entry.sourceKey}"></th:block></span>
+				    </div>
+				    
+				    <th:block th:each="sp : ${entry.taskParameter}">
+				    	<th:block th:if="${sp.display} == 'Y'">
+					    	<div class="weui-form-preview__item">
+						      <label class="weui-form-preview__label"><th:block th:utext="${sp.description}"></th:block></label>
+						      <span class="weui-form-preview__value"><th:block th:utext="${sp.name}"></th:block></span>
+						    </div>
+					    </th:block>
+				    </th:block>
+				    
+				  </div>
+				  <div class="weui-form-preview__ft">
+				    <a class="weui-form-preview__btn weui-form-preview__btn_default" href="javascript:">辅助操作</a>
+				    <button type="submit" class="weui-form-preview__btn weui-form-preview__btn_primary" href="javascript:">操作</button>
+				  </div>
+				</div>
+				<br/>
+			</th:block>
+			
+			<br/>
+			
+	    </div>
+        <div id="tab2" class="weui-tab__bd-item">
+          	<th:block th:each="entry : ${taskSuccess}">
+				 <div class="weui-form-preview">
+				  <div class="weui-form-preview__hd">
+				    <label class="weui-form-preview__label">状态</label>
+				    <em class="weui-form-preview__value">
+						<th:block th:switch="${entry.status}">
+								<th:block th:case="3">已刷到号</th:block>
+								<th:block th:case="4">已通知有号</th:block>
+						</th:block>
+					</em>
+				  </div>
+				  <div class="weui-form-preview__bd">
+				  
+				    <div class="weui-form-preview__item">
+				      <label class="weui-form-preview__label">创建时间</label>
+				      <span class="weui-form-preview__value"><th:block th:utext="${#dates.format(entry.createdTime,'yyyy-MM-dd HH:mm:ss')}"></th:block></span>
+				    </div>
+				    
+				    <div class="weui-form-preview__item">
+				      <label class="weui-form-preview__label">号源</label>
+				      <span class="weui-form-preview__value"><th:block th:utext="${entry.sourceKey}"></th:block></span>
+				    </div>
+				    
+				    <th:block th:each="sp : ${entry.taskParameter}">
+				    	<th:block th:if="${sp.display} == 'Y'">
+					    	<div class="weui-form-preview__item">
+						      <label class="weui-form-preview__label"><th:block th:utext="${sp.description}"></th:block></label>
+						      <span class="weui-form-preview__value"><th:block th:utext="${sp.name}"></th:block></span>
+						    </div>
+					    </th:block>
+				    </th:block>
+				    
+				  </div>
+				  <div class="weui-form-preview__ft">
+				    <a class="weui-form-preview__btn weui-form-preview__btn_default" href="javascript:">辅助操作</a>
+				    <button type="submit" class="weui-form-preview__btn weui-form-preview__btn_primary" href="javascript:">操作</button>
+				  </div>
+				</div>
+				<br/>
+			</th:block>
+			
+			<br/>
+			
+        </div>
+        <div id="tab3" class="weui-tab__bd-item">
+          	<th:block th:each="entry : ${taskComplete}">
+				 <div class="weui-form-preview">
+				  <div class="weui-form-preview__hd">
+				    <label class="weui-form-preview__label">状态</label>
+				    <em class="weui-form-preview__value">
+						<th:block th:switch="${entry.status}">
+								<th:block th:case="5">您取消了任务</th:block>
+								<th:block th:case="6">号源无返回</th:block>
+								<th:block th:case="7">任务已被您取消</th:block>
+								<th:block th:case="8">任务已到达最大刷次</th:block>
+								<th:block th:case="9">号源链接为空</th:block>
+								<th:block th:case="100">任务出错</th:block>
+						</th:block>
+					</em>
+				  </div>
+				  <div class="weui-form-preview__bd">
+				  
+				    <div class="weui-form-preview__item">
+				      <label class="weui-form-preview__label">创建时间</label>
+				      <span class="weui-form-preview__value"><th:block th:utext="${#dates.format(entry.createdTime,'yyyy-MM-dd HH:mm:ss')}"></th:block></span>
+				    </div>
+				    
+				    <div class="weui-form-preview__item">
+				      <label class="weui-form-preview__label">号源</label>
+				      <span class="weui-form-preview__value"><th:block th:utext="${entry.sourceKey}"></th:block></span>
+				    </div>
+				    
+				    <th:block th:each="sp : ${entry.taskParameter}">
+				    	<th:block th:if="${sp.display} == 'Y'">
+					    	<div class="weui-form-preview__item">
+						      <label class="weui-form-preview__label"><th:block th:utext="${sp.description}"></th:block></label>
+						      <span class="weui-form-preview__value"><th:block th:utext="${sp.name}"></th:block></span>
+						    </div>
+					    </th:block>
+				    </th:block>
+				    
+				  </div>
+				  <div class="weui-form-preview__ft">
+				    <a class="weui-form-preview__btn weui-form-preview__btn_default" href="javascript:">辅助操作</a>
+				    <button type="submit" class="weui-form-preview__btn weui-form-preview__btn_primary" href="javascript:">操作</button>
+				  </div>
+				</div>
+				<br/>
+			</th:block>
+			
+			<br/>
+			
+        </div>
+      </div>
+
+  <div class="weui-tabbar">
+    <a href="#tab1" class="weui-tabbar__item weui-bar__item--on">
+    <span class="weui-badge" style="position: absolute;top: -.4em;right: 1em;">8</span>
+      <div class="weui-tabbar__icon">
+        <img src="/jquery-weui-build/dist/demos/images/icon_nav_search_bar.png" alt="">
+      </div>
+      <p class="weui-tabbar__label">正在刷</p>
+    </a>
+    <a href="#tab2" class="weui-tabbar__item">
+      <div class="weui-tabbar__icon">
+        <img src="/jquery-weui-build/dist/demos/images/icon_nav_toast.png" alt="">
+      </div>
+      <p class="weui-tabbar__label">已刷到</p>
+    </a>
+    
+    <a href="#tab3" class="weui-tabbar__item">
+      <div class="weui-tabbar__icon">
+        <img src="/jquery-weui-build/dist/demos/images/icon_nav_button.png" alt="">
+      </div>
+      <p class="weui-tabbar__label">已结束</p>
+    </a>
+    
+    <a href="/doctor?TARGET=home" class="weui-tabbar__item">
+      <div class="weui-tabbar__icon">
+        <img src="/jquery-weui-build/dist/demos/images/icon_nav_swiper.png" alt="">
+      </div>
+      <p class="weui-tabbar__label">新起刷刷</p>
+    </a>
+  </div>
+</div>
+
+
+
+
+ 
+ <script src="/jquery-weui-build/dist/lib/jquery-2.1.4.js"></script>
+<script src="/jquery-weui-build/dist/js/jquery-weui.min.js"></script>
+<script src="/jquery-weui-build/dist/js/swiper.min.js"></script>
+<script src="/jquery-weui-build/dist/js/city-picker.min.js"></script>
+   </body>
+   <script>
+   		
+   		
+   </script>
+</html>
