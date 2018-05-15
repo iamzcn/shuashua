@@ -2,4 +2,4 @@
 
 cd C:\MongoDB\Server\mongodb-win32-x86_64-enterprise-windows-64-3.6.4\bin
 
-mongod.exe --dbpath C:\MongoDB\Data --bind_ip_all --logpath "C:\MongoDB\log\mongodb.log"
+start /b mongod.exe --dbpath C:\MongoDB\Data --bind_ip_all --logpath "C:\MongoDB\log\mongodb.log"
