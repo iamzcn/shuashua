@@ -5,8 +5,8 @@
       <meta http-equiv="X-UA-Compatible" content="IE=edge"></meta>
       <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"></meta>
       <title>刷刷</title>
-      <link rel="stylesheet" href="https://cdn.bootcss.com/weui/1.1.2/style/weui.min.css"/>
-		<link rel="stylesheet" href="https://cdn.bootcss.com/jquery-weui/1.2.0/css/jquery-weui.min.css"/>
+      <link rel="stylesheet" href="/jquery-weui-build/dist/lib//weui.min.css"/>
+	  <link rel="stylesheet" href="/jquery-weui-build/dist/css/jquery-weui.min.css"/>
 		
 	<style type="text/css">
 		div.hide{
@@ -16,7 +16,7 @@
    </head>
 <body>
 
-
+<h3>亲爱的<th:block th:utext="${nickname}"></th:block>，欢迎您使用刷刷，请选择</h3>
 
 <div class="weui-cells weui-cells_form">
 	   <div class="weui-cell">
@@ -50,12 +50,10 @@
 <a href="/doctor?TARGET=home" class="weui-btn weui-btn_primary">新起刷刷</a>
 
  
- <script src="https://cdn.bootcss.com/jquery/1.11.0/jquery.min.js"></script>
-<script src="https://cdn.bootcss.com/jquery-weui/1.2.0/js/jquery-weui.min.js"></script>
-
-<!-- 如果使用了某些拓展插件还需要额外的JS -->
-<script src="https://cdn.bootcss.com/jquery-weui/1.2.0/js/swiper.min.js"></script>
-<script src="https://cdn.bootcss.com/jquery-weui/1.2.0/js/city-picker.min.js"></script>
+<script src="/jquery-weui-build/dist/lib/jquery-2.1.4.js"></script>
+<script src="/jquery-weui-build/dist/js/jquery-weui.min.js"></script>
+<script src="/jquery-weui-build/dist/js/swiper.min.js"></script>
+<script src="/jquery-weui-build/dist/js/city-picker.min.js"></script>
 
 <input type="hidden" id="avoidDoubbleSubmitFlag" name="avoidDoubbleSubmitFlag" th:value="${avoidDoubbleSubmitFlag}"/>
 

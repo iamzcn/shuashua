@@ -4,16 +4,6 @@ public class SourceParameter {
 
 	public SourceParameter() {}
 	
-	public SourceParameter(String description,String name,String parameter,String value,String display, String dataType, String callBack) {
-		this.description = description;
-		this.name = name;
-		this.parameter = parameter;
-		this.value = value;
-		this.display = display;
-		this.dataType = dataType;
-		this.callBack = callBack;
-	}
-	
 	private String description;
 	private String name;
 	private String parameter;
@@ -21,9 +11,17 @@ public class SourceParameter {
 	private String display;
 	private String dataType;
 	private String callBack;
+	private String position;
 	
 	
-	
+	public String getPosition() {
+		return position;
+	}
+
+	public void setPosition(String position) {
+		this.position = position;
+	}
+
 	public String getCallBack() {
 		return callBack;
 	}

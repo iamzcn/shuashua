@@ -29,7 +29,7 @@ public class Task {
 	 private int tryCount;
 	 private int interval;
 	 private String monRegEx;
-	 private String exception;
+	 private List<String> exception = new ArrayList<String>();
 	 private String notification;
 	 private List<TemplateParam> wxTaskMsgSuccessValue = new ArrayList<TemplateParam>();
 	 private List<TemplateParam> wxTaskMsgStartValue = new ArrayList<TemplateParam>();
@@ -125,15 +125,17 @@ public class Task {
 
 	
 
-	public String getException() {
+	
+
+	
+
+	public List<String> getException() {
 		return exception;
 	}
 
-	public void setException(String exception) {
+	public void setException(List<String> exception) {
 		this.exception = exception;
 	}
-
-	
 
 	public String getNotification() {
 		return notification;

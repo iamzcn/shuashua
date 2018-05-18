@@ -31,6 +31,7 @@ import com.example.demo.pojo.SourceConfig;
 import com.example.demo.pojo.SourceParameter;
 import com.example.demo.pojo.Task;
 import com.example.demo.pojo.User;
+import com.example.demo.util.FileUtil;
 import com.example.demo.util.TaskUtil;
 import com.example.weixin.pojo.WXUser;
 import com.example.weixin.util.UserInfoUtil;
@@ -97,10 +98,12 @@ public class IndexController {
 			if(!StringUtils.isEmpty(infoMsg)) return shuaSubmitInfo;
 			
 			session.setAttribute("openId", wxUser.getOpenid());
+			session.setAttribute("nickname", wxUser.getNickname());
+			openId = wxUser.getOpenid();
 		}else {
 			
 		}
-		List<SourceConfig> scs = scRepo.findBySourceType("doctor");
+		List<SourceConfig> scs = scRepo.findBySourceTypeAndActive("doctor", "Y");
 		//HTML source drop down list selector
 		List<HTMLSelectOption> sources = new ArrayList<HTMLSelectOption>();
 		 
@@ -178,6 +181,7 @@ public class IndexController {
 		source.setValue("");
 		sources.add(source);
 		
+		
 		model.addAttribute("sources", sources);
 		model.addAttribute("sourceDisplayParamMap", sourceDisplayParamMap);
 		model.addAttribute("sourceDisplayLabelMap", sourceDisplayLabelMap);
@@ -185,6 +189,8 @@ public class IndexController {
 		String avoidDoubbleSubmitFlag = String.valueOf(Math.random());
 		model.addAttribute("avoidDoubbleSubmitFlag", avoidDoubbleSubmitFlag);
 		session.setAttribute("avoidDoubbleSubmitFlag", avoidDoubbleSubmitFlag);
+		
+		model.addAttribute("nickname", session.getAttribute("nickname"));
 		
 		return "index";  
    }
@@ -239,6 +245,8 @@ public class IndexController {
 			if(!StringUtils.isEmpty(infoMsg)) return shuaSubmitInfo;
 			
 			session.setAttribute("openId", wxUser.getOpenid());
+			session.setAttribute("nickname", wxUser.getNickname());
+			openId = wxUser.getOpenid();
 		}else {
 			
 		}
@@ -306,7 +314,7 @@ public class IndexController {
 			
 			
 			List<Task> taskOnHand = taskRepo.findByOpenIdAndStatusBetweenOrderByCreatedTimeDesc(openId, -0.9, 2.1);
-			if(user.getMaxTask() >= taskOnHand.size()) {
+			if( taskOnHand.size() >= user.getMaxTask()) {
 				infoMsg = "您的刷刷任务未能成功提交，原因：您的在刷任务数不能多于" + user.getMaxTask() + "个，请等待在结束或手动取消！";
 				model.addAttribute("infoMsg", infoMsg);
 				return shuaSubmitInfo;
@@ -360,10 +368,17 @@ public class IndexController {
 		return "shuaSubmitSuccess";
 	}
 	
-	@RequestMapping("/doctor/newshuashua2")  
-    String newShuaShua2(@RequestBody List<SourceParameter> sps, Model model) {
+	@RequestMapping("/doctor/sourceConfigParamUpdate")  
+    String sourceConfigParamUpdate(@RequestParam("file") String file, Model model) {
+		//The file should be in UTF-8 
+		FileUtil.readFileByLines(file);
 		
 		return "shuaSubmitSuccess";
 	}
 	
+	@RequestMapping("/doctor/sourceConfigParamMgnt")  
+    String sourceConfigParamMgnt(Model model) {
+		
+		return "sourceConfigMgnt";
+	}
 }

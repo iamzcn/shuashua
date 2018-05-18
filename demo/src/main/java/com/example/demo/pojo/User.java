@@ -16,9 +16,15 @@ public class User {
 	private int interval;
 	private String favorite;
 	private int maxTask;
+	private int maxFailureCount;
 	
-	
-	
+	public int getMaxFailureCount() {
+		return maxFailureCount;
+	}
+	public void setMaxFailureCount(int maxFailureCount) {
+		this.maxFailureCount = maxFailureCount;
+	}
+
 	public int getMaxTask() {
 		return maxTask;
 	}

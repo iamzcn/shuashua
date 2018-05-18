@@ -10,5 +10,5 @@ public interface SourceConfigRepository extends MongoRepository<SourceConfig, St
 
 	SourceConfig findById(String id);
 	
-	List<SourceConfig> findBySourceType(String sourceType);
+	List<SourceConfig> findBySourceTypeAndActive(String sourceType, String active);
 }

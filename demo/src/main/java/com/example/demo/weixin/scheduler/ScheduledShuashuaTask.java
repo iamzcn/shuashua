@@ -85,6 +85,7 @@ public class ScheduledShuashuaTask {
 //        }
 
 //        context.close();
+    	log.info(task + " is threaded now.");
     	try {
     		asyncTaskService.executeAsyncTask(task, repo);
     	}catch(TaskRejectedException e) {

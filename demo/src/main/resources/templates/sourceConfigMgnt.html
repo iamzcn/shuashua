@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+   <head>
+   	  <meta charset="utf-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge"></meta>
+      <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"></meta>
+      <title>刷刷</title>
+      <link rel="stylesheet" href="/jquery-weui-build/dist/lib//weui.min.css"/>
+	  <link rel="stylesheet" href="/jquery-weui-build/dist/css/jquery-weui.min.css"/>
+   </head>
+<body>
+
+<form id="fileForm" action="/doctor/sourceConfigParamUpdate">
+<input type="file" name="file" id="file" value="选择号源参数配置文件"/>
+<br/>
+<button onclick="s();">提交</button>
+</form>
+ 
+<script src="/jquery-weui-build/dist/lib/jquery-2.1.4.js"></script>
+<script src="/jquery-weui-build/dist/js/jquery-weui.min.js"></script>
+<script src="/jquery-weui-build/dist/js/swiper.min.js"></script>
+<script src="/jquery-weui-build/dist/js/city-picker.min.js"></script>
+
+   </body>
+   <script>
+   		function s(){
+   			var file = $("#file").val();
+   			if(file == ""){
+   				$.alert("请输入文件路径！");
+   				return;
+   			}
+   			$("#fileForm").submit();
+   		}
+   		
+   </script>
+</html>

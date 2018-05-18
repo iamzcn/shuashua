@@ -261,6 +261,7 @@ import com.example.weixin.util.MessageUtil;
 	                    user.setOpenId(fromUserName);
 	                    user.setInterval(10000);
 	                    user.setTryCount(Integer.MAX_VALUE);
+	                    user.setMaxFailureCount(10);
 	                    user.setMaxTask(2);
 	                    userRepo.save(user);
 	                    log.info("New user [" + fromUserName + "] is created.");

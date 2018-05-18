@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.Future;
 import java.util.regex.Matcher;
@@ -13,20 +14,24 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Component;
 
 import com.example.demo.dao.TaskRepository;
+import com.example.demo.dao.UserRepository;
 import com.example.demo.pojo.Constant;
 import com.example.demo.pojo.SourceParameter;
 import com.example.demo.pojo.Task;
 import com.example.demo.pojo.TaskCacheHashMap;
+import com.example.demo.pojo.User;
 import com.example.demo.util.TaskUtil;
 import com.example.weixin.pojo.AccessToken;
 import com.example.weixin.pojo.Template;
 import com.example.weixin.pojo.TemplateParam;
 import com.example.weixin.util.HttpPostUtil;
+import com.example.weixin.util.HttpUtil;
 import com.example.weixin.util.Sendmsg;
 
 import net.sf.json.JSONObject;
@@ -37,6 +42,9 @@ public class AsyncTaskService {
 	Random random = new Random();// 默认构造方法
 	
 	private final Logger log = LoggerFactory.getLogger(AsyncTaskService.class);
+	
+	@Autowired
+    private UserRepository userRepo;
 
     @Async
     // 表明是异步方法
@@ -47,7 +55,7 @@ public class AsyncTaskService {
     	
         try {
 	        
-	        Integer count = 0;
+	        Integer count = 0, failureCount = 0;
 	
 	        String url = task.getUrl();
 			
@@ -112,7 +120,41 @@ public class AsyncTaskService {
 						break;
 					}
 					
-						String ret = HttpPostUtil.doHttpPostJson(url, "");
+					
+					
+					String ret = "";
+						try {
+							//ret = HttpPostUtil.doHttpPostJson(url, "");
+							Map<String, String> params = new HashMap<String, String>();
+							List<SourceParameter> taskParams = task.getTaskParameter();
+							for(SourceParameter sp : taskParams) {
+								params.put(sp.getParameter(), sp.getValue());
+							}
+							ret = HttpUtil.doPost(task.getBaseURL(), params);
+							
+							if(count % 100 == 0) log.info(Thread.currentThread().getName() + " for task [" + task.toString() + "] this return [" + ret + "].");
+							
+						}catch(Exception e1) {
+							failureCount++;
+							User wxUser = userRepo.findByOpenId(task.getOpenId());
+							if(wxUser != null) {
+								int maxFailureCount = wxUser.getMaxFailureCount();
+								if(maxFailureCount >= failureCount) {
+									task.setAmendedTime(new Date());
+									task.getException().add(e1.getMessage());
+									TaskUtil.save(repo, task);
+									continue;
+								}else {
+									TaskUtil.buildWxTaskMsgValue(task, "ERROR", "您本次的刷刷号源累计失败已超过" + maxFailureCount + "次，可能由于过多人同时在刷，本次刷刷任务结束，请重新提交您的刷刷任务！");
+									task.setAmendedTime(new Date());
+									task.setNotification(Constant.NOTIFICATION_ERROR);
+									task.getException().add(e1.getMessage());
+									TaskUtil.save(repo, task);
+									TaskUtil.sendWXMsg(task, "ERROR");
+									log.info("Error message is sent to user [" + task.getOpenId() + "] for " + task.toString());
+								}
+							}
+						}
 						if(StringUtils.isNotEmpty(ret)) ret.trim();
 						else {
 							log.warn(Thread.currentThread().getName() + " for " + task.toString() + " return empty string, shutdown this thead.");
@@ -125,7 +167,7 @@ public class AsyncTaskService {
 							break;
 						}
 						
-						log.info(Thread.currentThread().getName() + " for task [" + task.toString() + "] this return [" + ret + "].");
+						//log.info(Thread.currentThread().getName() + " for task [" + task.toString() + "] this return [" + ret + "].");
 						//jsonObject = JSONObject.fromObject(ret);
 	
 						Matcher matcher = pattern.matcher(ret);
@@ -191,7 +233,7 @@ public class AsyncTaskService {
 			task.setStatus(Constant.TS_SHUTDOWN_ERROR);
 			
 			task.setAmendedTime(new Date());
-			task.setException(ee.getMessage());
+			task.getException().add(ee.getMessage());
 			
 			
 			try {

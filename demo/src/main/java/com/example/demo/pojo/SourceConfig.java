@@ -18,6 +18,7 @@ public class SourceConfig {
 	
 	private String sourceType;
 	private String sourceKey;
+	private String active;
 	private String sourceFrom;
 	private String baseURL;
 	private String parameters;
@@ -32,6 +33,12 @@ public class SourceConfig {
 	}
 	public void setId(String id) {
 		this.id = id;
+	}
+	public String getActive() {
+		return active;
+	}
+	public void setActive(String active) {
+		this.active = active;
 	}
 	public String getSourceType() {
 		return sourceType;
