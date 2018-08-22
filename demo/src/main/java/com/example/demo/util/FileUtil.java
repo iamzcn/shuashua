@@ -8,9 +8,21 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 import java.io.Reader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
+import com.example.demo.dao.SourceConfigRepository;
+import com.example.demo.pojo.SourceConfig;
+import com.example.demo.pojo.SourceParameter;
 
 public class FileUtil {
 	
@@ -140,24 +152,103 @@ public class FileUtil {
    /**
     * 以行为单位读取文件，常用于读面向行的格式化文件
     */
-   public static void readFileByLines(String fileName) {
+   @Transactional
+   public static boolean convertSourceConfigFile(String fileName, SourceConfigRepository scRepo) {
        File file = new File(fileName);
+       boolean status = false;
+       String flag = "C";
+       
        BufferedReader reader = null;
        try {
-           System.out.println("以行为单位读取文件内容，一次读一整行：");
+           log.info("以行为单位读取文件内容，一次读一整行：");
            InputStreamReader isr = new InputStreamReader(new FileInputStream(file), "UTF-8");
            reader = new BufferedReader(isr);
            String tempString = null;
            int line = 1;
+           Map<String, String> columnSeq = new HashMap<String, String>();
+           Map<String, String> sourceParamPosition = new HashMap<String, String>();
+           List<SourceParameter> spList = new ArrayList<SourceParameter>();
+           Set<String> sourceParamSet = new HashSet<String>();
+           
+           
+           
            // 一次读入一行，直到读入null为文件结束
            while ((tempString = reader.readLine()) != null) {
-               // 显示行号
-               System.out.println("line " + line + ": " + tempString);
+        	   
+        	   String[] spStrs = tempString.split("--------");
+        	   
+        	   if(line == 1) {
+        		   for(int i=0;i<spStrs.length;i++) { 
+            		   columnSeq.put(flag + i, "0");
+            	   }
+        	   }
+        	   
+        	   for(int i=0;i<spStrs.length;i++) {
+        		   String spStr = spStrs[i].replaceAll(System.lineSeparator(), "").replaceAll("\\p{C}", "").trim();
+        		   if(!StringUtils.isEmpty(spStr)) {
+	        		   if(sourceParamSet.add(spStr)) {
+	        		   
+		        		   String[] sps = spStr.split("\\|");
+		        		   SourceParameter sp = new SourceParameter();
+		            	   sp.setDescription(sps[0]);
+		            	   sp.setName(sps[1]);
+		            	   sp.setParameter(sps[2]);
+		            	   sp.setValue(sps[3]);
+		            	   sp.setDisplay(sps[4]);
+		            	   sp.setDataType(sps[5]);
+		            	   sp.setCallBack(sps.length==7?sps[6]:"");
+		            	   
+		            	   StringBuffer sbPosition = new StringBuffer();
+		            	   String currentColumnMaxValueStr = columnSeq.get(flag + i);
+		            	   int currentColumnMaxValue = Integer.parseInt(currentColumnMaxValueStr);
+		            	   
+		            	   
+		            	   sourceParamPosition.put(spStr, String.valueOf(currentColumnMaxValue + 1));
+		            	   columnSeq.put(flag + i, String.valueOf(currentColumnMaxValue + 1));
+		            	   
+		            	   String previousSPPosition = "";
+		            			   
+		            	   if(i > 0) {
+		            		   previousSPPosition = sourceParamPosition.get(spStrs[i-1].replaceAll(System.lineSeparator(), "").replaceAll("\\p{C}", "").trim());
+		            	   }
+		            	   
+		            	   if(!StringUtils.isEmpty(previousSPPosition)) {
+		            		   sbPosition.append(previousSPPosition).append("-");
+		            	   }
+		            	   
+		            	   sbPosition.append(sourceParamPosition.get(spStr));
+		            	   
+		            	   sp.setPosition(sbPosition.toString());
+		            	   sourceParamPosition.put(spStr, sp.getPosition());
+		            	   
+		            	   spList.add(sp);
+	        		   
+	        		   }
+        		   }
+        	   }
+        	   
                line++;
            }
            reader.close();
+           
+           String id = file.getName().split("\\.")[0];
+           SourceConfig sc = scRepo.findById(id);
+           sc.setActive("N");
+           scRepo.save(sc);
+           log.info("Source Config " + sc + " is unactive now.");
+           
+           sc.setId(null);
+           sc.setActive("Y");
+           sc.setSourceParameter(spList);
+           scRepo.save(sc);
+           
+           log.info("Source Config " + sc + " is created and active now.");
+           
+           status = true;
+           
        } catch (IOException e) {
            e.printStackTrace();
+           log.error("Failed to convert file [" + fileName + "].");
        } finally {
            if (reader != null) {
                try {
@@ -166,6 +257,8 @@ public class FileUtil {
                }
            }
        }
+       
+       return status;
    }
 
    /**

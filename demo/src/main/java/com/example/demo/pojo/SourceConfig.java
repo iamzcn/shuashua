@@ -108,6 +108,10 @@ public class SourceConfig {
 	public void setWxMsgErrorValue(List<TemplateParam> wxMsgErrorValue) {
 		this.wxMsgErrorValue = wxMsgErrorValue;
 	}
+	@Override
+	public String toString() {
+		return "SourceConfig [id=" + id + ", sourceType=" + sourceType + ", sourceKey=" + sourceKey + "]";
+	}
 	
 	
 	

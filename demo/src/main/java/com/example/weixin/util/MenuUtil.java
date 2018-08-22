@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.example.demo.controler.WeixinController;
+import com.example.demo.pojo.Constant;
 import com.example.weixin.pojo.menu.Button;
 import com.example.weixin.pojo.menu.ClickButton;
 import com.example.weixin.pojo.menu.Menu;
@@ -44,12 +45,12 @@ public class MenuUtil {
         ViewButton doctorShuaButton = new ViewButton();
         doctorShuaButton.setName("刷医生号源");
         doctorShuaButton.setType("view");
-        doctorShuaButton.setUrl("http://iamz.free.ngrok.cc/doctor?TARGET=home");
+        doctorShuaButton.setUrl("http://" + Constant.dns + "/doctor?TARGET=home");
         
         ViewButton myShuaButton = new ViewButton();
         myShuaButton.setName("我的刷刷");
         myShuaButton.setType("view");
-        myShuaButton.setUrl("http://iamz.free.ngrok.cc/doctor?TARGET=myShuaShua");
+        myShuaButton.setUrl("http://" + Constant.dns + "/doctor?TARGET=myShuaShua");
 
         ClickButton clickButton1 = new ClickButton();
         clickButton1.setKey("scanButton");

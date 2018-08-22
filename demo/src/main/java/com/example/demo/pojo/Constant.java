@@ -20,4 +20,6 @@ public class Constant {
 		public final static double TS_SHUTDOWN_EMPTY_URL = 9;
 		
 		public final static double TS_SHUTDOWN_ERROR = 100;
+		
+		public final static String dns = "iamz.free.idcfengye.com";
 }

@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.dao.UserRepository;
+import com.example.demo.pojo.Constant;
 import com.example.demo.pojo.User;
 import com.example.weixin.pojo.AccessToken;
 import com.example.weixin.pojo.resp.Article;
@@ -248,7 +249,7 @@ import com.example.weixin.util.MessageUtil;
                     article.setDescription("点击图文可以跳转，但只是测试页面");
                     // 将图片置为空
                     article.setPicUrl("http://www.sinaimg.cn/dy/slidenews/31_img/2016_38/28380_733695_698372.jpg");
-                    article.setUrl("http://iamz.free.ngrok.cc/doctor?TARGET=home");
+                    article.setUrl("http://" + Constant.dns + "/doctor?TARGET=home");
                     articleList.add(article);
                     newsMessage.setArticleCount(articleList.size());
                     newsMessage.setArticles(articleList);

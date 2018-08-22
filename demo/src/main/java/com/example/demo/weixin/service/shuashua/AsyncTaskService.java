@@ -132,7 +132,7 @@ public class AsyncTaskService {
 							}
 							ret = HttpUtil.doPost(task.getBaseURL(), params);
 							
-							if(count % 100 == 0) log.info(Thread.currentThread().getName() + " for task [" + task.toString() + "] this return [" + ret + "].");
+							if(count % 100 == 1) log.info(Thread.currentThread().getName() + " for task [" + task.toString() + "] this return [" + ret + "].");
 							
 						}catch(Exception e1) {
 							failureCount++;

@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.example.demo.pojo.Constant;
 import com.example.weixin.pojo.AccessToken;
@@ -16,6 +17,7 @@ import net.sf.json.JSONObject;
 @EnableScheduling
 @EnableAutoConfiguration
 @SpringBootApplication
+@EnableTransactionManagement
 public class DemoApplication {
 	
 	public static void main(String[] args) {

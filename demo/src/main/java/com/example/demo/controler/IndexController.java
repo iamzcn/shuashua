@@ -55,8 +55,8 @@ public class IndexController {
 	static
 	{
 		urlMapping = new HashMap<String, String>();
-		urlMapping.put("home", "http://iamz.free.ngrok.cc/doctor/home");  
-        urlMapping.put("myShuaShua", "http://iamz.free.ngrok.cc/doctor/myShuaShua"); 
+		urlMapping.put("home", "http://" + Constant.dns + "/doctor/home");  
+        urlMapping.put("myShuaShua", "http://" + Constant.dns + "/doctor/myShuaShua"); 
 	}
 	
 	private String shuaSubmitInfo = "shuaSubmitInfo";
@@ -199,7 +199,7 @@ public class IndexController {
 	void weixinRedirect(@RequestParam("TARGET") String TARGET, HttpServletResponse response, Model model, HttpSession session) throws IOException {
 
 		String openId = (String) session.getAttribute("openId");
-		//String REDIRECT_URI = "http://iamz.free.ngrok.cc/doctor/home";
+		
 		String REDIRECT_URI = urlMapping.get(TARGET);
 		if(StringUtils.isEmpty(openId)) {
 	        String SCOPE = "snsapi_userinfo";
@@ -365,15 +365,29 @@ public class IndexController {
 			
 		}
 
+		String successMsg = "您的刷刷任务已成功提交！";
+		model.addAttribute("successMsg", successMsg);
+		
 		return "shuaSubmitSuccess";
 	}
 	
 	@RequestMapping("/doctor/sourceConfigParamUpdate")  
     String sourceConfigParamUpdate(@RequestParam("file") String file, Model model) {
-		//The file should be in UTF-8 
-		FileUtil.readFileByLines(file);
+		//The file should be in UTF-8 code
+		boolean status = FileUtil.convertSourceConfigFile(file, scRepo);
 		
-		return "shuaSubmitSuccess";
+		if(status) {
+			String successMsg = "您的号源文件已成功导入！";
+			model.addAttribute("successMsg", successMsg);
+			
+			return "shuaSubmitSuccess";
+		}else {
+			String infoMsg = "号源文件导入失败！";
+			model.addAttribute("infoMsg", infoMsg);
+			
+			return "shuaSubmitInfo";
+		}
+		
 	}
 	
 	@RequestMapping("/doctor/sourceConfigParamMgnt")  
